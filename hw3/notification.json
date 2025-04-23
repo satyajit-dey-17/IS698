@@ -1,0 +1,9 @@
+{
+  "LambdaFunctionConfigurations": [
+    {
+      "Id": "s3-lambda-trigger",
+      "LambdaFunctionArn": "YOUR_LAMBDA_ARN",
+      "Events": ["s3:ObjectCreated:*"]
+    }
+  ]
+}
