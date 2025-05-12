@@ -1,0 +1,11 @@
+{
+  "Records": [
+    {
+      "s3": {
+        "bucket": { "name": "my-logging-bucket-123" },
+        "object": { "key": "trigger.txt" }
+      }
+    }
+  ]
+}
+

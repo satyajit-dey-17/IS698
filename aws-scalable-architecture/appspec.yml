@@ -1,0 +1,14 @@
+version: 0.0
+Resources:
+  - myLambda:
+      Type: AWS::Lambda::Function
+      Properties:
+        Name: lambda-stack-LogUploads
+Hooks:
+  BeforeAllowTraffic:
+    - location: scripts/pre_traffic.sh
+      timeout: 300
+  AfterAllowTraffic:
+    - location: scripts/post_traffic.sh
+      timeout: 300
+

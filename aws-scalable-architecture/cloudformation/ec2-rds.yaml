@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 + RDS (MySQL) stack with 2-AZ subnet group
+
+Parameters:
+  VpcId:
+    Type: String
+    Description: VPC where resources will be launched
+  PrivateSubnet1:
+    Type: String
+    Description: First private subnet ID (AZ1)
+  PrivateSubnet2:
+    Type: String
+    Description: Second private subnet ID (AZ2)
+  DBName:
+    Type: String
+    Default: mydatabase
+  DBUsername:
+    Type: String
+    Default: admin
+  DBPassword:
+    Type: String
+    NoEcho: true
+  InstanceClass:
+    Type: String
+    Default: db.t3.micro
+  AllocatedStorage:
+    Type: Number
+    Default: 20
+
+Resources:
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Private subnets for RDS (2-AZ)"
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  MyDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName:             !Ref DBName
+      MasterUsername:     !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      DBInstanceClass:    !Ref InstanceClass
+      Engine:             mysql
+      AllocatedStorage:   !Ref AllocatedStorage
+      VPCSecurityGroups:
+        - !GetAtt DBSecurityGroup.GroupId
+      DBSubnetGroupName:  !Ref DBSubnetGroup
+
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow MySQL access from EC2
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 10.0.1.0/24   # adjust to your public subnet CIDR
+
+Outputs:
+  DBEndpoint:
+    Value: !GetAtt MyDB.Endpoint.Address
+    Description: Connection endpoint for the MySQL database
+
